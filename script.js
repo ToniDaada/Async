@@ -16,7 +16,11 @@ const renderCountry = function (data, className) {
             <p class="country__row"><span>👫</span>${(
               +data.population / 1000000
             ).toFixed(1)}M</p>
-            <p class="country__row"><span>🗣️</span>${data.languages[0].name}</p>
+        
+        <p class="country__row">
+              <span>🗣️</span>${data.languages[0].name}
+            </p>
+          
             <p class="country__row"><span>💰</span>${
               data.currencies[0].name
             }</p>
@@ -31,6 +35,14 @@ const renderCountry = function (data, className) {
 const renderError = function (msg) {
   countriesContainer.insertAdjacentText('beforeend', msg);
   //   countriesContainer.style.opacity = 1;
+};
+
+const getJSON = function (url, errMsg = 'Something went wrong') {
+  fetch(url).then(response => {
+    if (!response.ok) throw new Error(errMsg);
+
+    return response.json();
+  });
 };
 // // Old school way
 // const getCountryDataAndNeighbour = function (country) {
@@ -78,46 +90,95 @@ const renderError = function (msg) {
 
 // PROMISE AND FETCH!!!!
 
-const getCountryData = function (...country) {
-  fetch(`https://restcountries.com/v2/name/${country}`)
-    .then(response => {
-      // MANUAL THROWING OF EERRORS
-      if (!response.ok)
-        throw new Error(`${country} not found (${response.status})`);
+// const getCountryData = function (country) {
+//   //   fetch()
+//   //     .then(response => {
+//   //       // MANUAL THROWING OF EERRORS
+//   //       if (!response.ok)
+//   //         throw new Error(`${country} not found (${response.status})`);
 
-      return response.json();
-    })
-    .then(data => {
-      renderCountry(data[0]);
-      const neighbour = data[0].borders?.[0];
-      return fetch(`https://restcountries.com/v2/alpha/${neighbour}`);
-    })
-    .then(response => response.json())
-    .then(data => {
-      renderCountry(data, 'neighbour');
-      const neighbour = data.borders?.[0];
-      return fetch(`https://restcountries.com/v2/alpha/${neighbour}`);
-    })
-    .then(response => response.json())
-    .then(data => {
-      renderCountry(data, 'neighbour');
-    })
-    .catch(err => {
-      console.log(err);
-      renderError(`Something went wrong!!!
+//   //       return response.json();
+//   //     })
+//   getJSON(`https://restcountries.com/v2/name/${country}`, `Country not found`)
+//     .then(data => {
+//       renderCountry(data[0]);
+//       const neighbour = data[0].borders?.[0];
+//       return getJSON(`https://restcountries.com/v2/name/${neighbour}`);
+//     })
+//     .then(data => {
+//       renderCountry(data, 'neighbour');
+//       const neighbour = data;
+//       return getJSON(`https://restcountries.com/v2/name/${neighbour}`);
+//     })
+//     .then(data => renderCountry(data, 'neighbour'))
+//     .catch(err => {
+//       renderError(`Something went wrong!!!
 
-        
-        ${err.message}
-        
-        Try again`);
-    })
-    .finally(() => {
-      countriesContainer.style.opacity = 1;
-    });
-};
+//         ${err.message}
 
-btn.addEventListener('click', function () {
-  getCountryData(`nigeria`);
+//         Try again`);
+//     })
+//     .finally(() => {
+//       countriesContainer.style.opacity = 1;
+//     });
+// };
+
+// btn.addEventListener('click', function () {
+//   getCountryData(`nigeria`);
+// });
+
+// // HANDLING REJECTED PROMISES
+
+//CHALLENGE 1
+// new API https:// api.bigdataclous.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}
+
+// const whereAmI = function (lat, lng) {
+//   fetch(
+//     `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}`
+//   )
+//     .then(response => {
+//       console.log(response.status);
+//       if (!response.ok) throw new Error(`Your request has timed out`);
+//       return response.json();
+//     })
+//     .then(data => {
+//       console.log(`You are in ${data.city}, ${data.countryName}`);
+//       return fetch(
+//         `https://restcountries.com/v2/name/${data.countryName.toLowerCase()}`
+//       );
+//     })
+//     .then(response => {
+//       return response.json();
+//     })
+//     .then(data => renderCountry(data[0]))
+//     .catch(err => console.log(err))
+//     .finally(() => (countriesContainer.style.opacity = 1));
+// };
+
+// btn.addEventListener('click', function () {
+//   whereAmI(52.508, 13.381);
+//   whereAmI(51, 13.381);
+//   // whereAmI(52.508, 13.381);
+//   whereAmI(6.5244, 3.1);
+// });
+
+// console.log('Test start');
+// setTimeout(() => console.log(`0 second timer`), 0);
+// Promise.resolve(`Resolved Prmoise 1`).then(res => console.log(res));
+// console.log(`Test end`);
+
+// Building a promise
+
+const lotteryPromise = new Promise(function (resolve, reject) {
+  console.log(`Lottery is happening`);
+  setTimeout(() => {
+    if (Math.random() >= 0.5) {
+      resolve(`You win nigga`);
+    } else {
+      reject(new Error(`You lost your money bitch`));
+    }
+  }, 2000);
 });
-
-// HANDLING REJECTED PROMISES
+lotteryPromise
+  .then(result => console.log(result))
+  .catch(err => console.log(err));
