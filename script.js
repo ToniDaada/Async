@@ -308,30 +308,37 @@ const getPosition = function () {
   });
 };
 const whereAmI = async function () {
-  const pos = await getPosition();
-  const { latitude: lat, longitude: lng } = pos.coords;
+  try {
+    const pos = await getPosition();
+    const { latitude: lat, longitude: lng } = pos.coords;
 
-  const res = await fetch(
-    `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}`
-  );
+    const res = await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}`
+    );
 
-  const data = await res.json();
-  console.log(data.countryCode);
-  const countryDetails = await fetch(
-    `https://restcountries.com/v2/name/${data.countryName}`
-  );
-  const result = await countryDetails.json();
-  renderCountry(result[0]);
+    if (res.ok) throw new Error('Problem getting ;pcation data');
 
-  // FOR NEIGHBOURS
-  const neighbour = result[0].borders;
-  if (!neighbour) return;
-  for (const item of neighbour) {
-    const res = await fetch(`https://restcountries.com/v2/alpha/${item}`);
     const data = await res.json();
-    renderCountry(data, 'neighbour');
+    console.log(data.countryCode);
+    const countryDetails = await fetch(
+      `https://restcountries.com/v2/name/${data.countryName}`
+    );
+    const result = await countryDetails.json();
+    renderCountry(result[0]);
+
+    // FOR NEIGHBOURS
+    const neighbour = result[0].borders;
+    if (!neighbour) return;
+    for (const item of neighbour) {
+      const res = await fetch(`https://restcountries.com/v2/alpha/${item}`);
+      const data = await res.json();
+      renderCountry(data, 'neighbour');
+    }
+  } catch (err) {
+    renderError(`Something went wrong ${err.message}`);
   }
 };
-btn.addEventListener('click', () => whereAmI());
+// btn.addEventListener('click', () => whereAmI());
+whereAmI();
 
 console.log('fIRST');
