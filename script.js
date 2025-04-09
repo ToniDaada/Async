@@ -155,30 +155,183 @@ const getJSON = function (url, errMsg = 'Something went wrong') {
 //     .finally(() => (countriesContainer.style.opacity = 1));
 // };
 
-// btn.addEventListener('click', function () {
-//   whereAmI(52.508, 13.381);
-//   whereAmI(51, 13.381);
-//   // whereAmI(52.508, 13.381);
-//   whereAmI(6.5244, 3.1);
+// // btn.addEventListener('click', function () {
+// //   whereAmI(52.508, 13.381);
+// //   whereAmI(51, 13.381);
+// //   // whereAmI(52.508, 13.381);
+// //   whereAmI(6.5244, 3.1);
+// // });
+
+// // console.log('Test start');
+// // setTimeout(() => console.log(`0 second timer`), 0);
+// // Promise.resolve(`Resolved Prmoise 1`).then(res => console.log(res));
+// // console.log(`Test end`);
+
+// // Building a promise
+
+// const lotteryPromise = new Promise(function (resolve, reject) {
+//   console.log(`Lottery is happening`);
+//   setTimeout(() => {
+//     if (Math.random() >= 0.5) {
+//       resolve(`You win nigga`);
+//     } else {
+//       reject(new Error(`You lost your money bitch`));
+//     }
+//   }, 2000);
 // });
+// lotteryPromise
+//   .then(result => console.log(result))
+//   .catch(err => console.log(err));
 
-// console.log('Test start');
-// setTimeout(() => console.log(`0 second timer`), 0);
-// Promise.resolve(`Resolved Prmoise 1`).then(res => console.log(res));
-// console.log(`Test end`);
+// const wait = function (seconds) {
+//   return new Promise(function (resolve) {
+//     setTimeout(resolve, seconds * 1000);
+//   });
+// };
+// wait(2)
+//   .then(() => {
+//     console.log(`I waited for two secinds`);
+//     return wait(1);
+//   })
+//   .then(() => console.log(`I waited fior 1 second`));
 
-// Building a promise
+// navigator.geolocation.getCurrentPosition(
+//   position => console.log(position),
+//   err => console.log(err)
+// );
+const promiseNavigator = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
 
-const lotteryPromise = new Promise(function (resolve, reject) {
-  console.log(`Lottery is happening`);
-  setTimeout(() => {
-    if (Math.random() >= 0.5) {
-      resolve(`You win nigga`);
-    } else {
-      reject(new Error(`You lost your money bitch`));
-    }
-  }, 2000);
-});
-lotteryPromise
-  .then(result => console.log(result))
-  .catch(err => console.log(err));
+// promiseNavigator()
+//   .then(res => console.log(res.coords))
+//   .catch(err => console.log(err));
+
+// const whereAmI = function () {
+//   promiseNavigator()
+//     .then(pos => {
+//       const { latitude: lat } = pos.coords;
+//       const { longitude: lng } = pos.coords;
+//       return fetch(
+//         `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}`
+//       );
+//     })
+//     .then(response => {
+//       console.log(response.status);
+//       if (!response.ok) throw new Error(`Your request has timed out`);
+//       return response.json();
+//     })
+//     .then(data => {
+//       console.log(`You are in ${data.city}, ${data.countryName}`);
+//       return fetch(
+// //         `https://restcountries.com/v2/name/${data.countryName.toLowerCase()}`
+// //       );
+// //     })
+// //     .then(response => {
+// //       return response.json();
+// //     })
+// //     .then(data => {
+// //       renderCountry(data[0]);
+// //       console.log(data[0]);
+// //       let neighbour = data[0].borders?.[0];
+
+// //       return fetch(`https://restcountries.com/v2/alpha/${neighbour}   `);
+// //     })
+// //     .then(res => res.json())
+// //     .then(data => renderCountry(data))
+// //     .catch(err => console.log(err))
+// //     .finally(() => (countriesContainer.style.opacity = 1));
+// // };
+
+// // btn.addEventListener('click', whereAmI);
+
+// const wait = function (seconds) {
+//   return new Promise(function (resolve) {
+//     setTimeout(resolve, seconds * 1000);
+//   });
+// };
+
+// const imgContainer = document.querySelector('.images');
+
+// // PATH 1
+// const createImage = function (imgPath) {
+//   return new Promise(function (resolve, reject) {
+//     const img = document.createElement('img');
+//     img.src = imgPath;
+
+//     img.addEventListener('load', function () {
+//       imgContainer.append(img);
+//       resolve(img);
+//     });
+
+//     img.addEventListener('error', function () {
+//       reject(new Error(`Image not found`));
+//     });
+//   });
+// };
+// let currImage;
+// createImage('img/img-1.jpg')
+//   .then(img => {
+//     currImage = img;
+//     console.log(`Image 1 loaded`);
+//     return wait(2);
+//   })
+//   .then(() => {
+//     currImage.style.display = 'none';
+//     console.log(`Hidden`);
+//     return createImage('img/img-2.jpg');
+//   })
+//   .then(img => {
+//     currImage = img;
+//     return wait(2);
+//   })
+//   .then(() => {
+//     currImage.style.display = 'none';
+//     console.log(`Hidden`);
+//     return createImage('img/img-3.jpg');
+//   })
+//   .then(img => {
+//     currImage = img;
+//     return wait(2);
+//   })
+//   .then(() => (currImage.style.display = 'none'))
+//   .catch(err => console.error(err.message));
+
+const getPosition = function () {
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(
+      position => resolve(position),
+      err => reject(err)
+    );
+  });
+};
+const whereAmI = async function () {
+  const pos = await getPosition();
+  const { latitude: lat, longitude: lng } = pos.coords;
+
+  const res = await fetch(
+    `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}`
+  );
+
+  const data = await res.json();
+  console.log(data.countryCode);
+  const countryDetails = await fetch(
+    `https://restcountries.com/v2/name/${data.countryName}`
+  );
+  const result = await countryDetails.json();
+  renderCountry(result[0]);
+
+  // FOR NEIGHBOURS
+  const neighbour = result[0].borders;
+  if (!neighbour) return;
+  for (const item of neighbour) {
+    const res = await fetch(`https://restcountries.com/v2/alpha/${item}`);
+    const data = await res.json();
+    renderCountry(data, 'neighbour');
+  }
+};
+btn.addEventListener('click', () => whereAmI());
+
+console.log('fIRST');
